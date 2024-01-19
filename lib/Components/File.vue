@@ -222,14 +222,6 @@ export default {
          * This determines the order of all files, existing and new, and sets it on the form.
          */
         setOrder() {
-            if(!this.multiple) {
-                return;
-            }
-
-            if(!this.handlesExistingFiles) {
-                return;
-            }
-
             if(!this.filepondInstance) {
                 return;
             }
