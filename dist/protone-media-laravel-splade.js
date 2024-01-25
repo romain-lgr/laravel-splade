@@ -4076,7 +4076,7 @@ const fn = Ff, kf = {
      * This determines the order of all files, existing and new, and sets it on the form.
      */
     setOrder() {
-      if (!this.filepondInstance)
+      if (!this.multiple || !this.filepondInstance)
         return;
       const t = this.filepondInstance.getFiles().filter((n) => !n.getMetadata("identifier")), r = this.filepondInstance.getFiles().map((n) => {
         const i = n.getMetadata("identifier");
