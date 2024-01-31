@@ -27,7 +27,7 @@ class Export
      */
     public function getSlug(): string
     {
-        return Str::slug($this->label);
+        return Str::slug($this->label, '-', 'ja');
     }
 
     /**
@@ -41,9 +41,9 @@ class Export
         return URL::signedRoute($route->getName(), array_merge(
             Arr::except(request()->query(), 'signature'),
             [
-                'table'  => base64_encode($this->tableClass),
+                'table' => base64_encode($this->tableClass),
                 'export' => base64_encode($this->key),
-                'slug'   => $this->getSlug(),
+                'slug' => $this->getSlug(),
             ]
         ));
     }

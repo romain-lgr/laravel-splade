@@ -28,7 +28,7 @@ class BulkAction
         public ?Closure $beforeCallback = null,
         public ?Closure $eachCallback = null,
         public ?Closure $afterCallback = null,
-        public bool|string $confirm = '',
+        public bool | string $confirm = '',
         public string $confirmText = '',
         public string $confirmButton = '',
         public string $cancelButton = '',
@@ -44,7 +44,7 @@ class BulkAction
      */
     public function getSlug(): string
     {
-        return Str::slug($this->label);
+        return Str::slug($this->label, '-', 'ja');
     }
 
     /**
@@ -59,9 +59,9 @@ class BulkAction
         $currentQuery = app()->bound('request') ? request()->query() : [];
 
         return URL::signedRoute($route->getName(), array_merge($currentQuery, [
-            'table'  => base64_encode($this->tableClass),
+            'table' => base64_encode($this->tableClass),
             'action' => base64_encode($this->key),
-            'slug'   => $this->getSlug(),
+            'slug' => $this->getSlug(),
         ]));
     }
 }
