@@ -37,7 +37,7 @@ class SpladeQueryBuilder extends SpladeTable
      * Initializes this instance with an empty resource. The results will be
      * loaded when the Table components calls the beforeRender() method.
      */
-    public function __construct(private BaseQueryBuilder|EloquentBuilder|SpatieQueryBuilder $builder, Request $request = null)
+    public function __construct(private BaseQueryBuilder | EloquentBuilder | SpatieQueryBuilder $builder, Request $request = null)
     {
         parent::__construct([], $request);
     }
@@ -148,9 +148,9 @@ class SpladeQueryBuilder extends SpladeTable
         $searchMethod = $searchMethod ?: SearchInput::WILDCARD;
 
         return match ($searchMethod) {
-            SearchInput::EXACT          => [$term, '='],
-            SearchInput::WILDCARD       => ["%{$term}%", $like],
-            SearchInput::WILDCARD_LEFT  => ["%{$term}", $like],
+            SearchInput::EXACT => [$term, '='],
+            SearchInput::WILDCARD => ["%{$term}%", $like],
+            SearchInput::WILDCARD_LEFT => ["%{$term}", $like],
             SearchInput::WILDCARD_RIGHT => ["{$term}%", $like],
         };
     }
@@ -158,8 +158,8 @@ class SpladeQueryBuilder extends SpladeTable
     private function applyConstraint(array $columns, string $terms)
     {
         $terms = $this->parseTerms
-            ? $this->parseTermsIntoCollection($terms)
-            : Collection::wrap($terms);
+        ? $this->parseTermsIntoCollection($terms)
+        : Collection::wrap($terms);
 
         // Start with a 'where' group, loop through all terms, and
         // add an 'orWhere' contraint for each column.
@@ -170,15 +170,17 @@ class SpladeQueryBuilder extends SpladeTable
 
                     if (!Str::contains($column, '.')) {
                         // Not a relationship, but a column on the table.
-                        return $builder->orWhere($builder->qualifyColumn($column), $whereOperator, $term);
+                        return $builder->orWhereRaw("UPPER(" . $builder->qualifyColumn($column) . ") COLLATE utf8mb4_unicode_ci LIKE ?", [$term]);
+                        // return $builder->orWhere($builder->qualifyColumn($column), $whereOperator, $term);
                     }
 
                     // Split the column into the relationship name and the key on the relationship.
                     $relation = Str::beforeLast($column, '.');
-                    $key      = Str::afterLast($column, '.');
+                    $key = Str::afterLast($column, '.');
 
                     $builder->orWhereHas($relation, function (EloquentBuilder $relation) use ($key, $whereOperator, $term) {
-                        return $relation->where($relation->qualifyColumn($key), $whereOperator, $term);
+                        return $relation->whereRaw("UPPER(" . $relation->qualifyColumn($key) . ") COLLATE utf8mb4_unicode_ci LIKE ?", $term);
+                        // return $relation->where($relation->qualifyColumn($key), $whereOperator, $term);
                     });
                 });
             });
@@ -234,7 +236,7 @@ class SpladeQueryBuilder extends SpladeTable
         $this->parseTerms(false);
 
         $this->filters()->filter->hasValue()->each(
-            fn (Filter $filter) => $this->applyConstraint([$filter->key => SearchInput::EXACT], $filter->value)
+            fn(Filter $filter) => $this->applyConstraint([$filter->key => SearchInput::EXACT], $filter->value)
         );
 
         $this->ignoreCase($ignoreCaseSetting);
@@ -250,7 +252,7 @@ class SpladeQueryBuilder extends SpladeTable
     private function applySearchInputs()
     {
         $this->searchInputs()->filter->value->each(
-            fn (SearchInput $searchInput) => $this->applyConstraint($searchInput->columns, $searchInput->value)
+            fn(SearchInput $searchInput) => $this->applyConstraint($searchInput->columns, $searchInput->value)
         );
     }
 
@@ -340,7 +342,7 @@ class SpladeQueryBuilder extends SpladeTable
     /**
      * Prepares the query for an export and returns the Builder.
      */
-    public function getBuilderForExport(): BaseQueryBuilder|EloquentBuilder|SpatieQueryBuilder
+    public function getBuilderForExport(): BaseQueryBuilder | EloquentBuilder | SpatieQueryBuilder
     {
         if (!$this->builder instanceof SpatieQueryBuilder) {
             $this->applyFilters();
