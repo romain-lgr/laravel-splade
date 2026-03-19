@@ -29,7 +29,7 @@ class CustomBladeCompiler extends BladeCompiler
      */
     public static function regexForTag(string $tag): string
     {
-        return '/(<\s*' . $tag . '(?:"[^"]*"|\'[^\']*\'|[^\'">])*>)(.|\n)*?(<\/' . $tag . '>)/';
+        return '/(<\s*' . $tag . '(?:"[^"]*"|\'[^\']*\'|[^\'">])*>)([\s\S]*?)(<\/' . $tag . '>)/';
     }
 
     /**
@@ -37,7 +37,7 @@ class CustomBladeCompiler extends BladeCompiler
      */
     protected function replaceCellComponentWithCellDirective(&$view)
     {
-        $view = preg_replace_callback(static::regexForTag(SpladeComponent::tag('table')), function ($table) {
+        $result = preg_replace_callback(static::regexForTag(SpladeComponent::tag('table')), function ($table) {
             $tableHtml    = $table[0];
             $tableOpening = $table[1];
 
@@ -68,6 +68,10 @@ class CustomBladeCompiler extends BladeCompiler
                 $arguments->get('use', ''),
             );
         }, $view);
+
+        if ($result !== null) {
+            $view = $result;
+        }
     }
 
     /**
